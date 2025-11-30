@@ -463,7 +463,7 @@ local function activateAbility(tower, abilityName, data)
     if data.towerTarget and type(data.towerTarget) == "number" then
         data.towerTarget = TDS.PlacedTowers[data.towerTarget]
     end
-1
+
     while true do
         local ok, res = pcall(function()
             return Remote:InvokeServer("Troops", "Abilities", "Activate", {
