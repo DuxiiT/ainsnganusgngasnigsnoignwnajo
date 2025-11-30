@@ -547,34 +547,33 @@ local function AutoMercenaryAbility()
 
 				-- M E R C E N A R Y  B A S E
 				if tower.Name == "Graveyard" then
-					task.spawn(function()
-						activateAbility(tower, "Air-Drop", {
-							pathName = 1,
-							directionCFrame = CFrame.new(),
-							dist = 150
-						})
+					activateAbility(tower, "Air-Drop", {
+						pathName = 1,
+						directionCFrame = CFrame.new(),
+						dist = 150
+						task.wait(1)
 					end)
 				end
 
 				-- H A C K E R
 				if tower.Name == "Hacker" then
-					task.spawn(function()
-						local targetIndex = 19
-						if TDS.PlacedTowers[targetIndex] then
-							local pos = HackerPositions[HackerIndex]
+					local targetIndex = 19
+					if TDS.PlacedTowers[targetIndex] then
+						local pos = HackerPositions[HackerIndex]
 
-							activateAbility(tower, "Hologram Tower", {
-								towerToClone = targetIndex,
-								towerPosition = pos
-							})
+						activateAbility(tower, "Hologram Tower", {
+							towerToClone = targetIndex,
+							towerPosition = pos
+						})
 
-							-- move to next position
-							HackerIndex += 1
-							if HackerIndex > #HackerPositions then
-								HackerIndex = 1
-							end
+						task.wait(1)
+
+						-- move to next position
+						HackerIndex += 1
+						if HackerIndex > #HackerPositions then
+							HackerIndex = 1
 						end
-					end)
+					end
 				end
 			end
 
