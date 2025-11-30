@@ -7,7 +7,7 @@ if not SendRequest then warn("No HTTP request function found.") return end
 -- SERVICES
 ---------------------------------------------------------------------
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RemoteFunction = ReplicatedStorage:WaitForChild("RemoteFunction")
+local Remote = ReplicatedStorage:WaitForChild("RemoteFunction")
 local RemoteEvent = ReplicatedStorage:WaitForChild("RemoteEvent")
 local NetworkModifiers = ReplicatedStorage:WaitForChild("Network"):WaitForChild("Modifiers"):WaitForChild("RF:BulkVoteModifiers")
 local LocalPlayer = game.Players.LocalPlayer
@@ -73,7 +73,7 @@ local function OverrideLobby(mapName)
     }
 
     local success, err = pcall(function()
-        RemoteFunction:InvokeServer(unpack(args))
+        Remote:InvokeServer(unpack(args))
     end)
 
     if success then
