@@ -672,7 +672,7 @@ while _G.AutoStrat do
 		towerPosition = Vector3.new(13.9221134, 2.05861521, 15.5796671)
 	})
 
-	task.wait(20)
+	task.wait(70)
 
 	setTroopOption(TDS.PlacedTowers[19], "Unit 1", "Riot Guard")
 	setTroopOption(TDS.PlacedTowers[19], "Unit 2", "Riot Guard")
