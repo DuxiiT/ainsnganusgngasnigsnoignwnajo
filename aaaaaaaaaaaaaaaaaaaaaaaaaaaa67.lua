@@ -658,15 +658,21 @@ while _G.AutoStrat do
 	TDS:Upgrade(17, 2)
     TDS:Upgrade(18, 2)
 
+	task.wait(5)
+
 	activateAbility(TDS.PlacedTowers[17], "Hologram Tower", {
 		towerToClone = 19,
 		towerPosition = Vector3.new(13.9221134, 5.05861521, 15.5796671)
 	})
 
+	task.wait(3)
+
 	activateAbility(TDS.PlacedTowers[18], "Hologram Tower", {
 		towerToClone = 19,
 		towerPosition = Vector3.new(13.9221134, 2.05861521, 15.5796671)
 	})
+
+	task.wait(20)
 
 	setTroopOption(TDS.PlacedTowers[19], "Unit 1", "Riot Guard")
 	setTroopOption(TDS.PlacedTowers[19], "Unit 2", "Riot Guard")
