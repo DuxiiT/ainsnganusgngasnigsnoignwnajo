@@ -225,11 +225,23 @@ end
 ---------------------------------------------------------------------
 local function GetCoinsAfterMatch()
     log("Coins", "Scanning rewards for coins...")
+    local rewardsSection = nil
     local root = PlayerGui:WaitForChild("ReactGameNewRewards")
-    local frame = root:WaitForChild("Frame")
-    local gameOver = frame:WaitForChild("gameOver")
-    local rewardsScreen = gameOver:WaitForChild("RewardsScreen")
-    local rewardsSection = rewardsScreen:WaitForChild("RewardsSection")
+
+    repeat
+        task.wait(0.25)
+
+        local frame = root:FindFirstChild("Frame")
+        if frame then
+            local gameOver = frame:FindFirstChild("gameOver")
+            if gameOver then
+                local rewardsScreen = gameOver:FindFirstChild("RewardsScreen")
+                if rewardsScreen then
+                    rewardsSection = rewardsScreen:FindFirstChild("RewardsSection")
+                end
+            end
+        end
+    until rewardsSection
 
     for _, reward in ipairs(rewardsSection:GetChildren()) do
         if tonumber(reward.Name) then
@@ -250,6 +262,39 @@ local function GetCoinsAfterMatch()
     return 0
 end
 
+---------------------------------------------------------------------
+-- TELEPORT AFTER MATCH
+---------------------------------------------------------------------
+local function TeleportAfterMatch()
+    log("Teleport", "Waiting for RewardsSection...")
+
+    local rewardsSection = nil
+    local root = PlayerGui:WaitForChild("ReactGameNewRewards")
+
+    repeat
+        task.wait(0.25)
+
+        local frame = root:FindFirstChild("Frame")
+        if frame then
+            local gameOver = frame:FindFirstChild("gameOver")
+            if gameOver then
+                local rewardsScreen = gameOver:FindFirstChild("RewardsScreen")
+                if rewardsScreen then
+                    rewardsSection = rewardsScreen:FindFirstChild("RewardsSection")
+                end
+            end
+        end
+    until rewardsSection
+
+    log("Teleport", "RewardsSection found, meaning game is over. Teleporting...")
+
+    local TeleportService = game:GetService("TeleportService")
+    local targetGameId = 3260590327
+
+    pcall(function()
+        TeleportService:Teleport(targetGameId, LocalPlayer)
+    end)
+end
 
 ---------------------------------------------------------------------
 -- WEBHOOK
@@ -418,7 +463,7 @@ local function activateAbility(tower, abilityName, data)
     if data.towerTarget and type(data.towerTarget) == "number" then
         data.towerTarget = TDS.PlacedTowers[data.towerTarget]
     end
-
+1
     while true do
         local ok, res = pcall(function()
             return Remote:InvokeServer("Troops", "Abilities", "Activate", {
@@ -486,10 +531,20 @@ function TDS:Upgrade(index, path)
     oldUpgrade(self, index, path)
 end
 
+local HackerPositions = {
+    Vector3.new(14.0727997, 3.46938467, 16.696434),
+    Vector3.new(13.7722702, 3.46936917, 9.73488903),
+    Vector3.new(8.10887527, 3.4693706, 9.26754189),
+    Vector3.new(1.69235086, 2.0586009, 9.3474369)
+}
+
+local HackerIndex = 1 -- keep track of current position
+
 local function AutoMercenaryAbility()
     spawn(function()
         while _G.AutoStrat do
             for i, tower in ipairs(TDS.PlacedTowers) do
+                -- Auto Mercenary Base
                 if tower.Name == "Graveyard" then
                     local success, err = pcall(function()
                         activateAbility(tower, "Air-Drop", {
@@ -502,6 +557,32 @@ local function AutoMercenaryAbility()
                         log("Mercenary", "Air-Drop used for tower #" .. i)
                     else
                         log("Mercenary", "Failed Air-Drop: "..tostring(err))
+                    end
+                end
+
+                -- Hacker Hologram
+                if tower.Name == "Hacker" then
+                    local targetIndex = 19 -- tower to clone
+                    if TDS.PlacedTowers[targetIndex] then
+                        local pos = HackerPositions[HackerIndex]
+                        local success, err = pcall(function()
+                            activateAbility(tower, "Hologram Tower", {
+                                towerToClone = targetIndex,
+                                towerPosition = pos
+                            })
+                        end)
+                        if success then
+                            log("Hacker", "Hologram Tower used for tower #" .. i .. " at position #" .. HackerIndex)
+                            -- move to next position
+                            HackerIndex = HackerIndex + 1
+                            if HackerIndex > #HackerPositions then
+                                HackerIndex = 1
+                            end
+                        else
+                            log("Hacker", "Failed Hologram Tower: "..tostring(err))
+                        end
+                    else
+                        log("Hacker", "Target tower for Hologram not ready yet.")
                     end
                 end
             end
@@ -658,21 +739,7 @@ while _G.AutoStrat do
 	TDS:Upgrade(17, 2)
     TDS:Upgrade(18, 2)
 
-	task.wait(5)
-
-	activateAbility(TDS.PlacedTowers[18], "Hologram Tower", {
-		towerToClone = 19,
-		towerPosition = Vector3.new(13.9221134, 2.05861521, 15.5796671)
-	})
-
-	task.wait(3)
-
-	activateAbility(TDS.PlacedTowers[17], "Hologram Tower", {
-		towerToClone = 19,
-		towerPosition = Vector3.new(13.6722698, 2.05861592, 9.89200115)
-	})
-
-	task.wait(62)
+	task.wait(70)
 
 	setTroopOption(TDS.PlacedTowers[19], "Unit 1", "Riot Guard")
 	setTroopOption(TDS.PlacedTowers[19], "Unit 2", "Riot Guard")
@@ -685,4 +752,8 @@ while _G.AutoStrat do
 	setTroopOption(TDS.PlacedTowers[21], "Unit 1", "Riot Guard")
 	setTroopOption(TDS.PlacedTowers[21], "Unit 2", "Riot Guard")
 	setTroopOption(TDS.PlacedTowers[21], "Unit 3", "Field Medic")
+
+	GetCoinsAfterMatch()
+
+	TeleportAfterMatch()
 end
