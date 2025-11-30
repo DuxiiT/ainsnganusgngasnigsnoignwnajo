@@ -578,7 +578,7 @@ local function AutoMercenaryAbility()
 				end
 			end
 
-			task.wait(1) -- loop refresh
+			task.wait(10) -- loop refresh
 		end
 	end)
 end
