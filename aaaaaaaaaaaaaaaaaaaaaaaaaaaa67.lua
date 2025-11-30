@@ -684,5 +684,5 @@ while _G.AutoStrat do
 
 	setTroopOption(TDS.PlacedTowers[21], "Unit 1", "Riot Guard")
 	setTroopOption(TDS.PlacedTowers[21], "Unit 2", "Riot Guard")
-	setTroopOption(TDS.PlacedTowers[21], "Unit 3", "Medic")
+	setTroopOption(TDS.PlacedTowers[21], "Unit 3", "Field Medic")
 end
