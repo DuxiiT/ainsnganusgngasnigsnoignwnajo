@@ -561,7 +561,7 @@ local function AutoMercenaryAbility()
                 end
 
                 -- Hacker Hologram
-                if tower.Name == "Hacker" then
+                if tower.Name == "Default" then
                     local targetIndex = 19 -- tower to clone
                     if TDS.PlacedTowers[targetIndex] then
                         local pos = HackerPositions[HackerIndex]
