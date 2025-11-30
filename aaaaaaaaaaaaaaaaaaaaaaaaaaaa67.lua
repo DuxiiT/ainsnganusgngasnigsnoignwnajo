@@ -513,6 +513,14 @@ end
 AutoMercenaryAbility() -- start background
 
 while _G.AutoStrat do
+    OverrideLobby("Simplicity")
+    VoteModifiers()
+    VoteLobby("Simplicity", Vector3.new(12.59, 10.64, 52.01))
+    ReadyUp()
+
+	task.wait(7)
+
+    Ready()
 
     TDS:Place("Shotgunner", -18.2444096, 2.35000038, -2.11120796, 1, 0, 0, 0, 1, 0, 0, 0, 1) -- 1
     TDS:Place("Shotgunner", -18.1074963, 2.35000086, -4.19810009, 1, 0, 0, 0, 1, 0, 0, 0, 1) -- 2
