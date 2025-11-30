@@ -490,7 +490,7 @@ local function AutoMercenaryAbility()
     spawn(function()
         while _G.AutoStrat do
             for i, tower in ipairs(TDS.PlacedTowers) do
-                if tower.Name == "Mercenary Base" and (TowerUpgrades[i] or 0) >= 5 then
+                if tower.Name == "Graveyard" then
                     local success, err = pcall(function()
                         activateAbility(tower, "Air-Drop", {
                             pathName = 1,
@@ -510,16 +510,15 @@ local function AutoMercenaryAbility()
     end)
 end
 
-AutoMercenaryAbility() -- start in background
+AutoMercenaryAbility() -- start background
 
 while _G.AutoStrat do
-    TDS.PlacedTowers = {} -- reset index list every loop
-    TowerUpgrades = {}
-
     OverrideLobby("Simplicity")
     VoteModifiers()
     VoteLobby("Simplicity", Vector3.new(12.59, 10.64, 52.01))
     ReadyUp()
+
+	task.wait(7)
 
     Ready()
 
@@ -653,6 +652,15 @@ while _G.AutoStrat do
     TDS:Upgrade(17)
     TDS:Upgrade(18)
 
-    RestartGame()
-    ReportCoins()
+	setTroopOption(19, "Unit 1", "Riot Guard")
+	setTroopOption(19, "Unit 2", "Riot Guard")
+	setTroopOption(19, "Unit 3", "Riot Guard")
+
+	setTroopOption(20, "Unit 1", "Riot Guard")
+	setTroopOption(20, "Unit 2", "Riot Guard")
+	setTroopOption(20, "Unit 3", "Riot Guard")
+
+	setTroopOption(21, "Unit 1", "Riot Guard")
+	setTroopOption(21, "Unit 2", "Riot Guard")
+	setTroopOption(21, "Unit 3", "Medic")
 end
