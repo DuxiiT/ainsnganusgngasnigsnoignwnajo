@@ -412,11 +412,11 @@ local function activateAbility(tower, abilityName, data)
 
     -- Convert tower numbers to actual instances if needed
     if data.towerToClone and type(data.towerToClone) == "number" then
-        data.towerToClone = _G.TDS.PlacedTowers[data.towerToClone]
+        data.towerToClone = TDS.PlacedTowers[data.towerToClone]
     end
 
     if data.towerTarget and type(data.towerTarget) == "number" then
-        data.towerTarget = _G.TDS.PlacedTowers[data.towerTarget]
+        data.towerTarget = TDS.PlacedTowers[data.towerTarget]
     end
 
     while true do
@@ -513,14 +513,6 @@ end
 AutoMercenaryAbility() -- start background
 
 while _G.AutoStrat do
-    OverrideLobby("Simplicity")
-    VoteModifiers()
-    VoteLobby("Simplicity", Vector3.new(12.59, 10.64, 52.01))
-    ReadyUp()
-
-	task.wait(7)
-
-    Ready()
 
     TDS:Place("Shotgunner", -18.2444096, 2.35000038, -2.11120796, 1, 0, 0, 0, 1, 0, 0, 0, 1) -- 1
     TDS:Place("Shotgunner", -18.1074963, 2.35000086, -4.19810009, 1, 0, 0, 0, 1, 0, 0, 0, 1) -- 2
@@ -652,15 +644,31 @@ while _G.AutoStrat do
     TDS:Upgrade(17)
     TDS:Upgrade(18)
 
-	setTroopOption(19, "Unit 1", "Riot Guard")
-	setTroopOption(19, "Unit 2", "Riot Guard")
-	setTroopOption(19, "Unit 3", "Riot Guard")
+	TDS:Upgrade(17)
+    TDS:Upgrade(18)
 
-	setTroopOption(20, "Unit 1", "Riot Guard")
-	setTroopOption(20, "Unit 2", "Riot Guard")
-	setTroopOption(20, "Unit 3", "Riot Guard")
+	TDS:Upgrade(17, 2)
+    TDS:Upgrade(18, 2)
 
-	setTroopOption(21, "Unit 1", "Riot Guard")
-	setTroopOption(21, "Unit 2", "Riot Guard")
-	setTroopOption(21, "Unit 3", "Medic")
+	activateAbility(TDS.PlacedTowers[17], "Hologram Tower", {
+		towerToClone = 19,
+		towerPosition = Vector3.new(13.9221134, 5.05861521, 15.5796671)
+	})
+
+	activateAbility(TDS.PlacedTowers[18], "Hologram Tower", {
+		towerToClone = 19,
+		towerPosition = Vector3.new(13.9221134, 2.05861521, 15.5796671)
+	})
+
+	setTroopOption(TDS.PlacedTowers[19], "Unit 1", "Riot Guard")
+	setTroopOption(TDS.PlacedTowers[19], "Unit 2", "Riot Guard")
+	setTroopOption(TDS.PlacedTowers[19], "Unit 3", "Riot Guard")
+
+	setTroopOption(TDS.PlacedTowers[20], "Unit 1", "Riot Guard")
+	setTroopOption(TDS.PlacedTowers[20], "Unit 2", "Riot Guard")
+	setTroopOption(TDS.PlacedTowers[20], "Unit 3", "Riot Guard")
+
+	setTroopOption(TDS.PlacedTowers[21], "Unit 1", "Riot Guard")
+	setTroopOption(TDS.PlacedTowers[21], "Unit 2", "Riot Guard")
+	setTroopOption(TDS.PlacedTowers[21], "Unit 3", "Medic")
 end
