@@ -469,6 +469,31 @@ local function activateAbility(tower, abilityName, data)
     end
 end
 
+-- Try activating ability once, return true if successful, false otherwise
+local function tryActivateAbility(tower, abilityName, data)
+    data = data or {}
+
+    if data.towerToClone and type(data.towerToClone) == "number" then
+        data.towerToClone = TDS.PlacedTowers[data.towerToClone]
+    end
+    if data.towerTarget and type(data.towerTarget) == "number" then
+        data.towerTarget = TDS.PlacedTowers[data.towerTarget]
+    end
+
+    local ok, res = pcall(function()
+        return Remote:InvokeServer("Troops", "Abilities", "Activate", {
+            Troop = tower,
+            Name = abilityName,
+            Data = data
+        })
+    end)
+
+    if ok and is_successful_response(res) then
+        return true
+    end
+    return false
+end
+
 -- TICKETS
 local function MainTimeScale()
     ReplicatedStorage.RemoteFunction:InvokeServer(
@@ -519,6 +544,7 @@ function TDS:Upgrade(index, path)
     oldUpgrade(self, index, path)
 end
 
+-- Combined tower ability loop
 local function AutoTowerAbilities()
     spawn(function()
         while _G.AutoStrat do
@@ -527,17 +553,15 @@ local function AutoTowerAbilities()
                 if tower.Name == "Graveyard" then
                     spawn(function()
                         while _G.AutoStrat and tower.Parent do
-                            local success, err = pcall(function()
-                                activateAbility(tower, "Air-Drop", {
-                                    pathName = 1,
-                                    directionCFrame = CFrame.new(0,0,0),
-                                    dist = 150
-                                })
-                            end)
+                            local success = tryActivateAbility(tower, "Air-Drop", {
+                                pathName = 1,
+                                directionCFrame = CFrame.new(0,0,0),
+                                dist = 150
+                            })
                             if success then
                                 log("Mercenary", "Air-Drop used for tower #" .. i)
                             else
-                                log("Mercenary", "Failed Air-Drop: "..tostring(err))
+                                log("Mercenary", "Air-Drop failed (maybe not enough cash)")
                             end
                             task.wait(5) -- cooldown
                         end
@@ -567,16 +591,14 @@ local function AutoTowerAbilities()
 
                             -- activate ability for each chosen position
                             for _, pos in ipairs(chosenPositions) do
-                                local success, err = pcall(function()
-                                    activateAbility(tower, "Hologram Tower", {
-                                        towerToClone = 19, -- adjust as needed
-                                        towerPosition = pos
-                                    })
-                                end)
+                                local success = tryActivateAbility(tower, "Hologram Tower", {
+                                    towerToClone = 19, -- adjust as needed
+                                    towerPosition = pos
+                                })
                                 if success then
                                     log("Hologram", "Hologram Tower used at "..tostring(pos))
                                 else
-                                    log("Hologram", "Failed Hologram Tower: "..tostring(err))
+                                    log("Hologram", "Hologram Tower failed (maybe not enough cash)")
                                 end
                             end
 
