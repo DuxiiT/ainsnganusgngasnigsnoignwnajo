@@ -480,7 +480,7 @@ local function tryActivateAbility(tower, abilityName, data)
         data.towerTarget = TDS.PlacedTowers[data.towerTarget]
     end
 
-    local ok, res = pcall(function()
+    local success, res = pcall(function()
         return Remote:InvokeServer("Troops", "Abilities", "Activate", {
             Troop = tower,
             Name = abilityName,
@@ -488,10 +488,13 @@ local function tryActivateAbility(tower, abilityName, data)
         })
     end)
 
-    if ok and is_successful_response(res) then
+    -- Only return true if it succeeded
+    if success and is_successful_response(res) then
         return true
+    else
+        -- Return false on failure, do NOT retry endlessly
+        return false
     end
-    return false
 end
 
 -- TICKETS
