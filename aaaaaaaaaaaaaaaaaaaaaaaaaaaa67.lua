@@ -572,7 +572,7 @@ function TDS:Upgrade(index, path)
 end
 
 while _G.AutoStrat do
-	UseTimescale = true
+	local UseTimescale = true
 	
     OverrideLobby("Simplicity")
     VoteModifiers()
