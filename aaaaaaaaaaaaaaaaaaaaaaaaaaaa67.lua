@@ -277,7 +277,7 @@ local function TeleportAfterMatch()
     log("Teleport", "RewardsSection found. Teleporting...")
 
     local TeleportService = game:GetService("TeleportService")
-    local targetGameId = 5245623
+    local targetGameId = 3260590327
 
     pcall(function()
         TeleportService:Teleport(targetGameId, LocalPlayer)
