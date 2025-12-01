@@ -519,31 +519,78 @@ function TDS:Upgrade(index, path)
     oldUpgrade(self, index, path)
 end
 
-local function AutoMercenaryAbility()
+local function AutoTowerAbilities()
     spawn(function()
         while _G.AutoStrat do
             for i, tower in ipairs(TDS.PlacedTowers) do
+                -- Mercenary Base
                 if tower.Name == "Graveyard" then
-                    local success, err = pcall(function()
-                        activateAbility(tower, "Air-Drop", {
-                            pathName = 1,
-                            directionCFrame = CFrame.new(0,0,0),
-                            dist = 150
-                        })
+                    spawn(function()
+                        while _G.AutoStrat and tower.Parent do
+                            local success, err = pcall(function()
+                                activateAbility(tower, "Air-Drop", {
+                                    pathName = 1,
+                                    directionCFrame = CFrame.new(0,0,0),
+                                    dist = 150
+                                })
+                            end)
+                            if success then
+                                log("Mercenary", "Air-Drop used for tower #" .. i)
+                            else
+                                log("Mercenary", "Failed Air-Drop: "..tostring(err))
+                            end
+                            task.wait(5) -- cooldown
+                        end
                     end)
-                    if success then
-                        log("Mercenary", "Air-Drop used for tower #" .. i)
-                    else
-                        log("Mercenary", "Failed Air-Drop: "..tostring(err))
-                    end
+                end
+
+                -- Hologram Tower
+                if tower.Name == "Default" then
+                    spawn(function()
+                        local HologramPositions = {
+                            Vector3.new(7.30943441, 3.46938562, 9.55802727),
+                            Vector3.new(12.9632034, 3.46938586, 9.9293232),
+                            Vector3.new(13.4509287, 3.46938491, 16.4675903),
+                            Vector3.new(15.9188004, 3.46937466, 3.81386924)
+                        }
+
+                        while _G.AutoStrat and tower.Parent do
+                            -- pick 4 random positions
+                            local chosenPositions = {}
+                            local positionsCopy = {table.unpack(HologramPositions)}
+                            for _ = 1, 4 do
+                                if #positionsCopy == 0 then break end
+                                local idx = math.random(1, #positionsCopy)
+                                table.insert(chosenPositions, positionsCopy[idx])
+                                table.remove(positionsCopy, idx)
+                            end
+
+                            -- activate ability for each chosen position
+                            for _, pos in ipairs(chosenPositions) do
+                                local success, err = pcall(function()
+                                    activateAbility(tower, "Hologram Tower", {
+                                        towerToClone = 19, -- adjust as needed
+                                        towerPosition = pos
+                                    })
+                                end)
+                                if success then
+                                    log("Hologram", "Hologram Tower used at "..tostring(pos))
+                                else
+                                    log("Hologram", "Failed Hologram Tower: "..tostring(err))
+                                end
+                            end
+
+                            task.wait(5) -- cooldown
+                        end
+                    end)
                 end
             end
-            task.wait(5)
+            task.wait(1) -- check for new towers
         end
     end)
 end
 
-AutoMercenaryAbility() -- start background
+AutoTowerAbilities() -- start the combined background ability handler
 
 while _G.AutoStrat do
     OverrideLobby("Simplicity")
