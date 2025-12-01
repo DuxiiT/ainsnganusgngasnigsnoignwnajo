@@ -20,10 +20,6 @@ local TotalCoins = StartCoins
 local GamesPlayed = 0
 local ScriptStart = os.time()
 
-local RewardAssets = {
-    ["18443277591"] = "Case",
-}
-
 print("[AutoStrat] Script started. StartCoins:", StartCoins)
 
 ---------------------------------------------------------------------
@@ -224,78 +220,35 @@ local function RestartGame()
 end
 
 ---------------------------------------------------------------------
--- GET REWARDS
+-- GET COINS
 ---------------------------------------------------------------------
-local function GetRewardsAfterMatch()
+local function GetCoinsAfterMatch()
+    log("Coins", "Scanning rewards for coins...")
     local root = PlayerGui:WaitForChild("ReactGameNewRewards")
     local frame = root:WaitForChild("Frame")
     local gameOver = frame:WaitForChild("gameOver")
     local rewardsScreen = gameOver:WaitForChild("RewardsScreen")
     local rewardsSection = rewardsScreen:WaitForChild("RewardsSection")
 
-    local rewards = {}
-    local coins = 0
-
-    -- Loop through each numbered reward frame
-    for _, rewardFrame in ipairs(rewardsSection:GetChildren()) do
-        if tonumber(rewardFrame.Name) then
-            local icon = rewardFrame:FindFirstChild("icon")
+    for _, reward in ipairs(rewardsSection:GetChildren()) do
+        if tonumber(reward.Name) then
+            local icon = reward:FindFirstChild("icon")
             if icon then
-                local displayText = ""
-
-                -- Check TextLabel inside icon
-                local textLabel = icon:FindFirstChildWhichIsA("TextLabel", true)
-                if textLabel and textLabel.Text and #textLabel.Text > 0 then
-                    -- Sum coins if it's a coin reward
-                    if textLabel.Text:find("Coins") then
-                        local num = tonumber(textLabel.Text:match("(%d+)"))
-                        if num then coins = coins + num end
-                    elseif not textLabel.Text:find("XP") then
-                        -- Only add non-Coins, non-XP to rewards
-                        displayText = textLabel.Text
+                for _, obj in ipairs(icon:GetDescendants()) do
+                    if obj:IsA("TextLabel") and obj.Text and obj.Text:find("Coins") then
+                        local num = tonumber(obj.Text:match("(%d+)"))
+                        log("Coins", "Found coin reward: "..(num or 0))
+                        return num or 0
                     end
-                end
-
-                -- Check ImageLabel inside icon
-                local imageLabel = icon:FindFirstChildWhichIsA("ImageLabel", true)
-                if imageLabel and imageLabel.Image and imageLabel.Image ~= "" then
-                    local assetId = imageLabel.Image:match("%d+")
-                    if assetId then
-                        local rewardName = RewardAssets[assetId]
-                        -- Skip Coins or XP Boost entirely
-                        if rewardName and rewardName ~= "Coins" and rewardName ~= "XP Boost" then
-                            if displayText:match("%dx") then
-                                displayText = displayText.." "..rewardName
-                            elseif displayText == "" then
-                                displayText = rewardName
-                            else
-                                displayText = displayText.." "..rewardName.."(s)"
-                            end
-                        end
-                    end
-                end
-
-                if displayText ~= "" then
-                    table.insert(rewards, displayText)
                 end
             end
         end
     end
 
-    -- Check match result (Win/Loss)
-    local status = "Unknown"
-    local rewardBanner = rewardsScreen:FindFirstChild("RewardBanner")
-    if rewardBanner then
-        local bannerLabel = rewardBanner:FindFirstChildWhichIsA("TextLabel")
-        if bannerLabel and bannerLabel.Text then
-            status = bannerLabel.Text
-        end
-    end
-
-    return coins, rewards, status
+    log("Coins", "No coin reward found.")
+    return 0
 end
 
----------------------------------------------------------------------
 -- TELEPORT AFTER MATCH (Updated)
 ---------------------------------------------------------------------
 local function TeleportAfterMatch()
@@ -316,12 +269,12 @@ local function TeleportAfterMatch()
         end
     until rewardsSection
 
-    -- Collect rewards BEFORE teleporting
-    local gained, allRewards, matchStatus = GetRewardsAfterMatch()
+    -- Collect coins BEFORE teleporting
+    local gained = GetCoinsAfterMatch()
     GamesPlayed += 1
     TotalCoins += gained
 
-    -- Send webhook with all info
+    -- Send webhook (minimal info)
     local payload = {
         username = "🎮 TDS AutoStrat",
         embeds = {{
@@ -330,8 +283,6 @@ local function TeleportAfterMatch()
             fields = {
                 { name = "💰 Coins Earned", value = tostring(gained), inline = true },
                 { name = "🏆 Total Coins", value = tostring(TotalCoins), inline = true },
-                { name = "🎁 Rewards", value = #allRewards > 0 and table.concat(allRewards, "\n") or "None", inline = false },
-                { name = "📜 Match Status", value = matchStatus, inline = true },
             },
         }}
     }
@@ -343,7 +294,7 @@ local function TeleportAfterMatch()
         Body = game:GetService("HttpService"):JSONEncode(payload)
     })
 
-        -- Teleport after coins and webhook
+    -- Teleport after coins and webhook
     local TeleportService = game:GetService("TeleportService")
     local targetGameId = 3260590327
 
