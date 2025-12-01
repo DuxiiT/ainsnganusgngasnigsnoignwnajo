@@ -537,7 +537,7 @@ function TDS:Place(name, x, y, z)
     spawn(function()
         if newTower.Name == "Graveyard" then
             while _G.AutoStrat and newTower.Parent do
-                tryActivateAbility(newTower, "Air-Drop", {pathName = 1, directionCFrame = CFrame.new(), dist = 150})
+                tryActivateAbility(newTower, "Air-Drop", {pathName = 1, directionCFrame = CFrame.new(), dist = 69420})
                 task.wait(2)
             end
         elseif newTower.Name == "Default" then
@@ -716,20 +716,6 @@ while _G.AutoStrat do
 
 	TDS:Upgrade(17, 2)
     TDS:Upgrade(18, 2)
-
-    task.wait(75)
-
-	setTroopOption(TDS.PlacedTowers[19], "Unit 1", "Riot Guard")
-	setTroopOption(TDS.PlacedTowers[19], "Unit 2", "Riot Guard")
-	setTroopOption(TDS.PlacedTowers[19], "Unit 3", "Riot Guard")
-
-	setTroopOption(TDS.PlacedTowers[20], "Unit 1", "Riot Guard")
-	setTroopOption(TDS.PlacedTowers[20], "Unit 2", "Riot Guard")
-	setTroopOption(TDS.PlacedTowers[20], "Unit 3", "Riot Guard")
-
-	setTroopOption(TDS.PlacedTowers[21], "Unit 1", "Riot Guard")
-	setTroopOption(TDS.PlacedTowers[21], "Unit 2", "Riot Guard")
-	setTroopOption(TDS.PlacedTowers[21], "Unit 3", "Medic")
 
     TeleportAfterMatch()
 end
