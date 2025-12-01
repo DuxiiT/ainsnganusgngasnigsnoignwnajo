@@ -587,6 +587,8 @@ while _G.AutoStrat do
 
 	MainUseTimeScale()
 
+	MainUseTimeScale()
+
     TDS:Place("Shotgunner", -18.2444096, 2.35000038, -2.11120796, 1, 0, 0, 0, 1, 0, 0, 0, 1) -- 1
     TDS:Place("Shotgunner", -18.1074963, 2.35000086, -4.19810009, 1, 0, 0, 0, 1, 0, 0, 0, 1) -- 2
     TDS:Place("Shotgunner", -18.2207069, 2.34998345, -6.32968712, 1, 0, 0, 0, 1, 0, 0, 0, 1) -- 3
