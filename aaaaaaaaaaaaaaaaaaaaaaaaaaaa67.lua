@@ -760,7 +760,7 @@ while _G.AutoStrat do
 	TDS:Upgrade(17, 2)
     TDS:Upgrade(18, 2)
 
-    task.wait(60)
+    task.wait(75)
 
 	setTroopOption(TDS.PlacedTowers[19], "Unit 1", "Riot Guard")
 	setTroopOption(TDS.PlacedTowers[19], "Unit 2", "Riot Guard")
