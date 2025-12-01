@@ -250,18 +250,14 @@ local function GetCoinsAfterMatch()
     return 0
 end
 
----------------------------------------------------------------------
--- TELEPORT AFTER MATCH
+-- TELEPORT AFTER MATCH (Updated)
 ---------------------------------------------------------------------
 local function TeleportAfterMatch()
-    log("Teleport", "Waiting for RewardsSection...")
-
-    local rewardsSection = nil
+    -- Wait for rewards screen first
     local root = PlayerGui:WaitForChild("ReactGameNewRewards")
-
+    local rewardsSection
     repeat
         task.wait(0.25)
-
         local frame = root:FindFirstChild("Frame")
         if frame then
             local gameOver = frame:FindFirstChild("gameOver")
@@ -274,39 +270,21 @@ local function TeleportAfterMatch()
         end
     until rewardsSection
 
-    log("Teleport", "RewardsSection found. Teleporting...")
+    -- Collect coins BEFORE teleporting
+    local gained = GetCoinsAfterMatch()
+    GamesPlayed += 1
+    TotalCoins += gained
 
-    local TeleportService = game:GetService("TeleportService")
-    local targetGameId = 3260590327
-
-    pcall(function()
-        TeleportService:Teleport(targetGameId, LocalPlayer)
-    end)
-end
-
----------------------------------------------------------------------
--- WEBHOOK
----------------------------------------------------------------------
-local function SendWebhook(totalCoins, gained)
-    log("Webhook", "Preparing webhook... Gained="..gained.." Total="..totalCoins)
-
-    local elapsed = os.time() - ScriptStart
-    local hours = math.floor(elapsed / 3600)
-    local minutes = math.floor((elapsed % 3600) / 60)
-
+    -- Send webhook (minimal info)
     local payload = {
-        username = "🎮 TDS AutoStrat Log",
+        username = "🎮 TDS AutoStrat",
         embeds = {{
             title = "✅ Match Completed!",
             color = 0x00FF99,
             fields = {
-                { name = "🕹 Games Played", value = "**"..GamesPlayed.."**", inline = true },
-                { name = "💰 Coins Earned", value = "**"..gained.."**", inline = true },
-                { name = "🏆 Total Coins", value = "**"..totalCoins.."**", inline = true },
-                { name = "⏱ Runtime", value = "**"..hours.."h "..minutes.."m**" },
+                { name = "💰 Coins Earned", value = tostring(gained), inline = true },
+                { name = "🏆 Total Coins", value = tostring(TotalCoins), inline = true },
             },
-            footer = { text = "TDS AutoStrat | Keep farming! 🚀" },
-            timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ", os.time())
         }}
     }
 
@@ -317,26 +295,14 @@ local function SendWebhook(totalCoins, gained)
         Body = game:GetService("HttpService"):JSONEncode(payload)
     })
 
-    log("Webhook", "Webhook sent successfully.")
+    -- Teleport after coins and webhook
+    local TeleportService = game:GetService("TeleportService")
+    local targetGameId = 3260590327
+
+    pcall(function()
+        TeleportService:Teleport(targetGameId, LocalPlayer)
+    end)
 end
-
----------------------------------------------------------------------
--- REPORT COINS
----------------------------------------------------------------------
-local function ReportCoins()
-    task.wait(1)
-    local gained = GetCoinsAfterMatch()
-    GamesPlayed += 1
-    TotalCoins += gained
-
-    log("Report", string.format(
-        "Match %d complete | Gained: %d | Total: %d",
-        GamesPlayed, gained, TotalCoins
-    ))
-
-    SendWebhook(TotalCoins, gained)
-end
-
 
 ---------------------------------------------------------------------
 -- TOWER ENGINE
