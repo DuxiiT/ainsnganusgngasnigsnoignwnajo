@@ -537,7 +537,7 @@ function TDS:Place(name, x, y, z)
     spawn(function()
         if newTower.Name == "Graveyard" then
             while _G.AutoStrat and newTower.Parent do
-                tryActivateAbility(newTower, "Air-Drop", {pathName = 1, directionCFrame = CFrame.new(), dist = 69420})
+                tryActivateAbility(newTower, "Air-Drop", {pathName = 1, directionCFrame = CFrame.new(), dist = 150})
                 task.wait(2)
             end
         elseif newTower.Name == "Default" then
@@ -572,6 +572,8 @@ function TDS:Upgrade(index, path)
 end
 
 while _G.AutoStrat do
+	UseTimescale = true
+	
     OverrideLobby("Simplicity")
     VoteModifiers()
     VoteLobby("Simplicity", Vector3.new(12.59, 10.64, 52.01))
@@ -580,6 +582,10 @@ while _G.AutoStrat do
 	task.wait(7)
 
     Ready()
+
+	MainTimeScale()
+
+	MainUseTimeScale()
 
     TDS:Place("Shotgunner", -18.2444096, 2.35000038, -2.11120796, 1, 0, 0, 0, 1, 0, 0, 0, 1) -- 1
     TDS:Place("Shotgunner", -18.1074963, 2.35000086, -4.19810009, 1, 0, 0, 0, 1, 0, 0, 0, 1) -- 2
@@ -716,6 +722,24 @@ while _G.AutoStrat do
 
 	TDS:Upgrade(17, 2)
     TDS:Upgrade(18, 2)
+
+	if UseTimescale then
+		task.wait(40)
+	else
+		task.wait(80)
+	end
+
+	setTroopOption(TDS.PlacedTowers[19], "Unit 1", "Riot Guard")
+	setTroopOption(TDS.PlacedTowers[19], "Unit 2", "Riot Guard")
+	setTroopOption(TDS.PlacedTowers[19], "Unit 3", "Riot Guard")
+
+	setTroopOption(TDS.PlacedTowers[20], "Unit 1", "Riot Guard")
+	setTroopOption(TDS.PlacedTowers[20], "Unit 2", "Riot Guard")
+	setTroopOption(TDS.PlacedTowers[20], "Unit 3", "Riot Guard")
+
+	setTroopOption(TDS.PlacedTowers[21], "Unit 1", "Riot Guard")
+	setTroopOption(TDS.PlacedTowers[21], "Unit 2", "Riot Guard")
+	setTroopOption(TDS.PlacedTowers[21], "Unit 3", "Field Medic")
 
     TeleportAfterMatch()
 end
