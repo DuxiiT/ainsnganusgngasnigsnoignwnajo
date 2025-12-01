@@ -538,7 +538,7 @@ function TDS:Place(name, x, y, z)
         if newTower.Name == "Graveyard" then
             while _G.AutoStrat and newTower.Parent do
                 tryActivateAbility(newTower, "Air-Drop", {pathName = 1, directionCFrame = CFrame.new(), dist = 150})
-                task.wait(5)
+                task.wait(2)
             end
         elseif newTower.Name == "Default" then
             local positions = {
@@ -551,7 +551,7 @@ function TDS:Place(name, x, y, z)
                 for _, pos in ipairs(positions) do
                     tryActivateAbility(newTower, "Hologram Tower", {towerToClone = 19, towerPosition = pos})
                 end
-                task.wait(5)
+                task.wait(2)
             end
         end
     end)
