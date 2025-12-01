@@ -346,6 +346,34 @@ TDS.PlacedTowers = {}
 
 local TowerUpgrades = {} -- track upgrades per tower
 
+-- Try activating ability once, return true if successful, false otherwise
+local function tryActivateAbility(tower, abilityName, data)
+    data = data or {}
+
+    if data.towerToClone and type(data.towerToClone) == "number" then
+        data.towerToClone = TDS.PlacedTowers[data.towerToClone]
+    end
+    if data.towerTarget and type(data.towerTarget) == "number" then
+        data.towerTarget = TDS.PlacedTowers[data.towerTarget]
+    end
+
+    local success, res = pcall(function()
+        return Remote:InvokeServer("Troops", "Abilities", "Activate", {
+            Troop = tower,
+            Name = abilityName,
+            Data = data
+        })
+    end)
+
+    -- Only return true if it succeeded
+    if success and is_successful_response(res) then
+        return true
+    else
+        -- Return false on failure, do NOT retry endlessly
+        return false
+    end
+end
+
 local function placeTower(towerName, position)
     while true do
         local ok, res = pcall(function()
@@ -469,34 +497,6 @@ local function activateAbility(tower, abilityName, data)
     end
 end
 
--- Try activating ability once, return true if successful, false otherwise
-local function tryActivateAbility(tower, abilityName, data)
-    data = data or {}
-
-    if data.towerToClone and type(data.towerToClone) == "number" then
-        data.towerToClone = TDS.PlacedTowers[data.towerToClone]
-    end
-    if data.towerTarget and type(data.towerTarget) == "number" then
-        data.towerTarget = TDS.PlacedTowers[data.towerTarget]
-    end
-
-    local success, res = pcall(function()
-        return Remote:InvokeServer("Troops", "Abilities", "Activate", {
-            Troop = tower,
-            Name = abilityName,
-            Data = data
-        })
-    end)
-
-    -- Only return true if it succeeded
-    if success and is_successful_response(res) then
-        return true
-    else
-        -- Return false on failure, do NOT retry endlessly
-        return false
-    end
-end
-
 -- TICKETS
 local function MainTimeScale()
     ReplicatedStorage.RemoteFunction:InvokeServer(
@@ -532,6 +532,30 @@ function TDS:Place(name, x, y, z)
     until newTower
 
     table.insert(self.PlacedTowers, newTower)
+
+    -- Start ability loop for this tower immediately
+    spawn(function()
+        if newTower.Name == "Graveyard" then
+            while _G.AutoStrat and newTower.Parent do
+                tryActivateAbility(newTower, "Air-Drop", {pathName = 1, directionCFrame = CFrame.new(), dist = 150})
+                task.wait(5)
+            end
+        elseif newTower.Name == "Default" then
+            local positions = {
+                Vector3.new(7.3, 3.46, 9.55),
+                Vector3.new(12.96, 3.46, 9.92),
+                Vector3.new(13.45, 3.46, 16.46),
+                Vector3.new(15.91, 3.46, 3.81)
+            }
+            while _G.AutoStrat and newTower.Parent do
+                for _, pos in ipairs(positions) do
+                    tryActivateAbility(newTower, "Hologram Tower", {towerToClone = 19, towerPosition = pos})
+                end
+                task.wait(5)
+            end
+        end
+    end)
+
     return #self.PlacedTowers
 end
 
@@ -546,59 +570,6 @@ end
 function TDS:Upgrade(index, path)
     oldUpgrade(self, index, path)
 end
-
--- Combined tower ability loop
-local function AutoTowerAbilities()
-    for i, tower in ipairs(TDS.PlacedTowers) do
-        -- Mercenary Base
-        if tower.Name == "Graveyard" then
-            spawn(function()
-                while _G.AutoStrat and tower.Parent do
-                    local ok = tryActivateAbility(tower, "Air-Drop", {
-                        pathName = 1,
-                        directionCFrame = CFrame.new(0,0,0),
-                        dist = 150
-                    })
-                    if ok then
-                        log("Mercenary", "Air-Drop used for tower #" .. i)
-                    else
-                        log("Mercenary", "Air-Drop skipped (not enough cash or other issue)")
-                    end
-                    task.wait(5) -- cooldown
-                end
-            end)
-        end
-
-        -- Hacker / Hologram Tower
-        if tower.Name == "Default" then
-            spawn(function()
-                local HologramPositions = {
-                    Vector3.new(7.30943441, 3.46938562, 9.55802727),
-                    Vector3.new(12.9632034, 3.46938586, 9.9293232),
-                    Vector3.new(13.4509287, 3.46938491, 16.4675903),
-                    Vector3.new(15.9188004, 3.46937466, 3.81386924)
-                }
-
-                while _G.AutoStrat and tower.Parent do
-                    for _, pos in ipairs(HologramPositions) do
-                        local ok = tryActivateAbility(tower, "Hologram Tower", {
-                            towerToClone = 19,
-                            towerPosition = pos
-                        })
-                        if ok then
-                            log("Hologram", "Hologram Tower used at "..tostring(pos))
-                        else
-                            log("Hologram", "Hologram Tower skipped")
-                        end
-                    end
-                    task.wait(5) -- cooldown
-                end
-            end)
-        end
-    end
-end
-
-AutoTowerAbilities() -- start the combined background ability handler
 
 while _G.AutoStrat do
     OverrideLobby("Simplicity")
