@@ -556,16 +556,19 @@ local function AutoTowerAbilities()
                 if tower.Name == "Graveyard" then
                     spawn(function()
                         while _G.AutoStrat and tower.Parent do
-                            local success = tryActivateAbility(tower, "Air-Drop", {
+                            local ok = tryActivateAbility(tower, "Air-Drop", {
                                 pathName = 1,
                                 directionCFrame = CFrame.new(0,0,0),
                                 dist = 150
                             })
-                            if success then
+
+                            if ok then
                                 log("Mercenary", "Air-Drop used for tower #" .. i)
                             else
-                                log("Mercenary", "Air-Drop failed (maybe not enough cash)")
+                                -- Fail silently, don't spam
+                                log("Mercenary", "Air-Drop skipped (not enough cash or other issue)")
                             end
+
                             task.wait(5) -- cooldown
                         end
                     end)
@@ -582,7 +585,6 @@ local function AutoTowerAbilities()
                         }
 
                         while _G.AutoStrat and tower.Parent do
-                            -- pick 4 random positions
                             local chosenPositions = {}
                             local positionsCopy = {table.unpack(HologramPositions)}
                             for _ = 1, 4 do
@@ -592,16 +594,17 @@ local function AutoTowerAbilities()
                                 table.remove(positionsCopy, idx)
                             end
 
-                            -- activate ability for each chosen position
                             for _, pos in ipairs(chosenPositions) do
-                                local success = tryActivateAbility(tower, "Hologram Tower", {
+                                local ok = tryActivateAbility(tower, "Hologram Tower", {
                                     towerToClone = 19, -- adjust as needed
                                     towerPosition = pos
                                 })
-                                if success then
+
+                                if ok then
                                     log("Hologram", "Hologram Tower used at "..tostring(pos))
                                 else
-                                    log("Hologram", "Hologram Tower failed (maybe not enough cash)")
+                                    -- Fail silently
+                                    log("Hologram", "Hologram Tower skipped (not enough cash or other issue)")
                                 end
                             end
 
@@ -610,7 +613,7 @@ local function AutoTowerAbilities()
                     end)
                 end
             end
-            task.wait(1) -- check for new towers
+            task.wait(1)
         end
     end)
 end
