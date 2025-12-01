@@ -1,0 +1,79 @@
+local QOT = queue_on_teleport or (syn and syn.queue_on_teleport) or (fluxus and fluxus.queue_on_teleport)
+if QOT then
+    QOT([[
+
+        _G.AutoStrat = true
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+        local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RemoteFunction = ReplicatedStorage:WaitForChild("RemoteFunction")
+
+        local function log(section,msg)
+            print(string.format("[%s | %s] %s", os.date("%H:%M:%S"), section, msg))
+        end
+
+        local function IsLobby() return PlayerGui:FindFirstChild("LobbyGui") ~= nil end
+        local function IsInGame() return PlayerGui:FindFirstChild("GameGui") ~= nil end
+
+        local function StartMultiplayerSurvival()
+            log("AutoStrat","Starting multiplayer survival...")
+            RemoteFunction:InvokeServer("Multiplayer","v2:start",{difficulty="Fallen",mode="survival",count=1})
+        end
+
+		-- Permanent loop
+		while _G.AutoStrat do
+			-- Wait until either LobbyGui or GameGui exists
+			repeat
+				task.wait(0.5)
+			until IsLobby() or IsInGame()
+
+			if IsLobby() then
+				log("AutoStrat","Detected lobby, starting match")
+				StartMultiplayerSurvival()
+			elseif IsInGame() then
+				log("AutoStrat","Detected in-game, running AutoStrat")
+				task.wait(10)
+				loadstring(game:HttpGet("https://raw.githubusercontent.com/DuxiiT/ainsnganusgngasnigsnoignwnajo/refs/heads/main/aaaaaaaaaaaaaaaaaaaaaaaaaaaa67.lua"))()
+				-- Wait until the match ends (LobbyGui appears again)
+				repeat task.wait(1) until IsLobby()
+			end
+		end
+    ]])
+end
+
+_G.AutoStrat = true
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RemoteFunction = ReplicatedStorage:WaitForChild("RemoteFunction")
+
+local function log(section,msg)
+    print(string.format("[%s | %s] %s", os.date("%H:%M:%S"), section, msg))
+end
+
+local function IsLobby() return PlayerGui:FindFirstChild("LobbyGui") ~= nil end
+local function IsInGame() return PlayerGui:FindFirstChild("GameGui") ~= nil end
+
+local function StartMultiplayerSurvival()
+    log("AutoStrat","Starting multiplayer survival...")
+    RemoteFunction:InvokeServer("Multiplayer","v2:start",{difficulty="Fallen",mode="survival",count=1})
+end
+
+while _G.AutoStrat do
+	repeat
+        task.wait(0.5)
+	until IsLobby() or IsInGame()
+
+	if IsLobby() then
+        log("AutoStrat","Detected lobby, starting match")
+        StartMultiplayerSurvival()
+	elseif IsInGame() then
+        log("AutoStrat","Detected in-game, running AutoStrat")
+        task.wait(10)
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/DuxiiT/ainsnganusgngasnigsnoignwnajo/refs/heads/main/aaaaaaaaaaaaaaaaaaaaaaaaaaaa67.lua"))()
+
+        repeat task.wait(1) until IsLobby()
+	end
+end
