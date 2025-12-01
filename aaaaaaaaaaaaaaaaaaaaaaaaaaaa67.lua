@@ -549,73 +549,53 @@ end
 
 -- Combined tower ability loop
 local function AutoTowerAbilities()
-    spawn(function()
-        while _G.AutoStrat do
-            for i, tower in ipairs(TDS.PlacedTowers) do
-                -- Mercenary Base
-                if tower.Name == "Graveyard" then
-                    spawn(function()
-                        while _G.AutoStrat and tower.Parent do
-                            local ok = tryActivateAbility(tower, "Air-Drop", {
-                                pathName = 1,
-                                directionCFrame = CFrame.new(0,0,0),
-                                dist = 150
-                            })
-
-                            if ok then
-                                log("Mercenary", "Air-Drop used for tower #" .. i)
-                            else
-                                -- Fail silently, don't spam
-                                log("Mercenary", "Air-Drop skipped (not enough cash or other issue)")
-                            end
-
-                            task.wait(5) -- cooldown
-                        end
-                    end)
+    for i, tower in ipairs(TDS.PlacedTowers) do
+        -- Mercenary Base
+        if tower.Name == "Graveyard" then
+            spawn(function()
+                while _G.AutoStrat and tower.Parent do
+                    local ok = tryActivateAbility(tower, "Air-Drop", {
+                        pathName = 1,
+                        directionCFrame = CFrame.new(0,0,0),
+                        dist = 150
+                    })
+                    if ok then
+                        log("Mercenary", "Air-Drop used for tower #" .. i)
+                    else
+                        log("Mercenary", "Air-Drop skipped (not enough cash or other issue)")
+                    end
+                    task.wait(5) -- cooldown
                 end
-
-                -- Hologram Tower
-                if tower.Name == "Default" then
-                    spawn(function()
-                        local HologramPositions = {
-                            Vector3.new(7.30943441, 3.46938562, 9.55802727),
-                            Vector3.new(12.9632034, 3.46938586, 9.9293232),
-                            Vector3.new(13.4509287, 3.46938491, 16.4675903),
-                            Vector3.new(15.9188004, 3.46937466, 3.81386924)
-                        }
-
-                        while _G.AutoStrat and tower.Parent do
-                            local chosenPositions = {}
-                            local positionsCopy = {table.unpack(HologramPositions)}
-                            for _ = 1, 4 do
-                                if #positionsCopy == 0 then break end
-                                local idx = math.random(1, #positionsCopy)
-                                table.insert(chosenPositions, positionsCopy[idx])
-                                table.remove(positionsCopy, idx)
-                            end
-
-                            for _, pos in ipairs(chosenPositions) do
-                                local ok = tryActivateAbility(tower, "Hologram Tower", {
-                                    towerToClone = 19, -- adjust as needed
-                                    towerPosition = pos
-                                })
-
-                                if ok then
-                                    log("Hologram", "Hologram Tower used at "..tostring(pos))
-                                else
-                                    -- Fail silently
-                                    log("Hologram", "Hologram Tower skipped (not enough cash or other issue)")
-                                end
-                            end
-
-                            task.wait(5) -- cooldown
-                        end
-                    end)
-                end
-            end
-            task.wait(1)
+            end)
         end
-    end)
+
+        -- Hacker / Hologram Tower
+        if tower.Name == "Default" then
+            spawn(function()
+                local HologramPositions = {
+                    Vector3.new(7.30943441, 3.46938562, 9.55802727),
+                    Vector3.new(12.9632034, 3.46938586, 9.9293232),
+                    Vector3.new(13.4509287, 3.46938491, 16.4675903),
+                    Vector3.new(15.9188004, 3.46937466, 3.81386924)
+                }
+
+                while _G.AutoStrat and tower.Parent do
+                    for _, pos in ipairs(HologramPositions) do
+                        local ok = tryActivateAbility(tower, "Hologram Tower", {
+                            towerToClone = 19,
+                            towerPosition = pos
+                        })
+                        if ok then
+                            log("Hologram", "Hologram Tower used at "..tostring(pos))
+                        else
+                            log("Hologram", "Hologram Tower skipped")
+                        end
+                    end
+                    task.wait(5) -- cooldown
+                end
+            end)
+        end
+    end
 end
 
 AutoTowerAbilities() -- start the combined background ability handler
