@@ -269,6 +269,8 @@ local function TeleportAfterMatch()
         end
     until rewardsSection
 
+	task.wait(2)
+
     -- Collect coins BEFORE teleporting
     local gained = GetCoinsAfterMatch()
     GamesPlayed += 1
